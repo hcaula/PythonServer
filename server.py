@@ -2,20 +2,18 @@ import socket
 import sys
 import os
 
+server_address = './snap.socket'
 CHUNK_SIZE = 8 * 1024
 
-response = 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'
+response_json = 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n'
+response_bin = 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\n\n'
 
-vscode = response + open('./files/vscode').read()
-core = response + open('./files/ubuntu-core').read()
+vscode = response_json + open('./files/vscode').read()
+core = response_json + open('./files/ubuntu-core').read()
 b8 = open('./files/b8X2psL1ryVrPt5WEmpYiqfr5emixTd7_1797.snap', 'rb')
 xp = open('./files/XPQdduIwHiDCZvPHRrmsqV7Nr6nQRuqM_52.snap', 'rb')
 
 conn_end = str.encode('Connection ended')
-
-server_address = './snap.socket'
-
-# print (vscode)
 
 # Make sure the socket does not already exist
 try:
@@ -35,6 +33,7 @@ sock.bind(server_address)
 sock.listen(1)
 
 def send(data, connection):
+    connection.send(str.encode(response_bin))
     chunk = data.read(CHUNK_SIZE)
     while (chunk):
         connection.send(chunk)
